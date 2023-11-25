@@ -1,0 +1,57 @@
+#!/bin/sh
+
+##
+# Generate a .env file filled with random values suitable for local development
+#
+
+# Init dirs
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+TEMP_DIR=$(mktemp -d)
+GENERATED_DIR="$ROOT_DIR/generated"
+mkdir -p $GENERATED_DIR
+
+# Init files
+PRIVATE_KEY="$TEMP_DIR/private_key.pem"
+PUBLIC_KEY="$TEMP_DIR/public_key.pem"
+CLIENT_PRIVATE_KEY="$TEMP_DIR/client_private_key.pem"
+CLIENT_PUBLIC_KEY="$TEMP_DIR/client_public_key.pem"
+DOTENV_FILE="$GENERATED_DIR/.env"
+PASSPHRASE_FILE="$TEMP_DIR/passphrase.txt"
+
+# Generate keys
+ENCRYPTION_PASSPHRASE=$(openssl rand -base64 32)
+CLIENT_ENCRYPTION_PASSPHRASE=$(openssl rand -base64 32)
+SYMETRIC_KEY_BASE64=$(openssl rand -base64 32)
+IV_BASE64=$(openssl rand -base64 16)
+CLIENT_IV_BASE64=$(openssl rand -base64 16)
+echo $ENCRYPTION_PASSPHRASE > $PASSPHRASE_FILE
+openssl genrsa -out $PRIVATE_KEY -passout file:$PASSPHRASE_FILE 2048
+openssl rsa -in $PRIVATE_KEY -passin file:$PASSPHRASE_FILE -pubout -out $PUBLIC_KEY
+
+# Output to new .env file
+cat << EOF > $DOTENV_FILE
+# Server Env Vars
+DATABASE_URL="file:./dev.db"
+ENCRYPTION_PASSPHRASE="$ENCRYPTION_PASSPHRASE"
+SYMETRIC_KEY_BASE64="$SYMETRIC_KEY_BASE64"
+PRIVATE_KEY_BASE64="$(cat $PRIVATE_KEY | base64)"
+PUBLIC_KEY_BASE64="$(cat $PUBLIC_KEY | base64)"
+IV_BASE64="$IV_BASE64"
+# Client Env Vars
+NEXT_PUBLIC_CLIENT_PUBLIC_KEY_BASE64="$(cat $PUBLIC_KEY | base64)"
+NEXT_PUBLIC_IV_BASE64="$IV_BASE64"
+NEXT_PUBLIC_SYMETRIC_KEY_BASE64="$SYMETRIC_KEY_BASE64"
+EOF
+
+# Cleanup
+mv $TEMP_DIR/*.pem $GENERATED_DIR
+rm -rf $TEMP_DIR
+
+echo "All generated certs stored in $GENERATED_DIR"
+echo "Generated .env file at $DOTENV_FILE"
+
+if [ ! -f "$ROOT_DIR/.env" ]; then
+  cp $DOTENV_FILE $ROOT_DIR/.env
+  echo "Copied generated .env file to $ROOT_DIR/.env"
+fi

@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Whisper {
+  id                      String    @id @default(cuid())
+  data                    String
+  createdAt               DateTime  @default(now())
+  deleteAt                DateTime
+  deleteOnOpen            Boolean   @default(true)
+  showDeleteOnReadWarning Boolean   @default(true)
+}

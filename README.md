@@ -1,36 +1,68 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Ephemeral Whisper
+
+A self hosted e2e encrypted temporary note sharing application used for sending sensitive information.
 
 ## Getting Started
 
-First, run the development server:
+### Quickstart
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. `yarn install`
+2. `bin/generate_env`
+3. `yarn dev`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Configuration
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+To use this application you need an RSA keypair with passphrase, an IV, and a symetric key value. All values except for the encryption passphrase need to be BASE64 encoded environment variables.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+You can use the `bin/generate_env` script to automatically create a `.env` file along with the certificate files as a quick way to get started. Once the `.env` file is created, you can move it to the root directory of this project.
 
-## Learn More
+#### Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+##### DATABASE_URL
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Can be set to any relative filepath such as `file:./dev.db`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+##### ENCRYPTION_PASSPHRASE
 
-## Deploy on Vercel
+Random string with at least 24 charachters
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+##### SYMETRIC_KEY_BASE64
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+`openssl rand -base64 32`
+
+##### PRIVATE_KEY_BASE64
+
+`openssl genrsa -des3 -out private.pem 2048 && cat private.pem | base64`
+When prompted enter the value used for your `ENCRYPTION_PASSPHRASE`
+
+##### PUBLIC_KEY_BASE64
+
+`openssl rsa -in private.pem -pubout -out public.pem && cat public.pem | base64`
+When prompted enter the value used for your `ENCRYPTION_PASSPHRASE`
+
+##### IV_BASE64
+
+`openssl rand -base64 16`
+
+#### Cron Jobs
+
+In order to automatically purge expired whispers, you will need to set up a cron job that calls `GET /api/purge_expired_secrets`
+
+Calling this endpoint will automatically purge any whispers that have expired as of the time of the call and utilizes a temporary lock. So it is safe to call as frequently as you want.
+
+### Local Dev
+
+Run the development server with `yarn dev`
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the app.
+
+### Tests
+
+Tests are run using Playwright and have a GitHub action set up to automatically run on pushes to `main` or PR's.
+
+### TODO
+
+- Add salting to the encryption
+- Component tests
+- Switch to Postgres
+- Dockerize local dev env
