@@ -5,11 +5,6 @@ const nextConfig = {
       bodySizeLimit: "1mb",
     },
   },
-  exportPathMap: async function () {
-    return {
-      "/": { page: "/whisper" },
-    };
-  },
 };
 
 module.exports = nextConfig;
