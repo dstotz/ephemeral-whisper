@@ -7,8 +7,10 @@ on:
 
 jobs:
   test:
-    timeout-minutes: 60
+    timeout-minutes: 30
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.40.0-jammy
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -16,16 +18,20 @@ jobs:
           node-version: 20
           cache: yarn
       - name: Install dependencies
-        run: yarn
-      - name: Install Playwright Browsers
-        run: yarn playwright install --with-deps
-      - name: Config test environment
-        run: bin/generate_env
-      - name: Run Playwright tests
+        run: yarn install --frozen-lockfile
+      - name: Configure test environment
+        run: bin/generate_env && yarn db:migrate
+      - name: Run your tests
         run: yarn test
+        env:
+          HOME: /root
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: test-data
           retention-days: 30
+          path: |
+            playwright-report/
+            generated/
+            prisma/dev.db
+            .env

@@ -34,7 +34,9 @@ test.describe("View", () => {
       });
 
       test("it should be deleted on open", async ({ page }) => {
-        await page.goto(`/whisper/${whisper!.id}/view`);
+        await page.goto(`/whisper/${whisper!.id}/view`, {
+          waitUntil: "domcontentloaded",
+        });
         const dbRecord = await getWhisperRecord(whisper!.id);
         expect(dbRecord).toBeNull();
       });
@@ -61,13 +63,17 @@ test.describe("View", () => {
       });
 
       test("it should not be deleted on open", async ({ page }) => {
-        await page.goto(`/whisper/${whisper!.id}/view`);
+        await page.goto(`/whisper/${whisper!.id}/view`, {
+          waitUntil: "domcontentloaded",
+        });
         const dbRecord = await getWhisperRecord(whisper!.id);
         expect(dbRecord).toEqual(whisper);
       });
 
       test("it should not show delete warning page", async ({ page }) => {
-        await page.goto(`/whisper/${whisper!.id}`);
+        await page.goto(`/whisper/${whisper!.id}`, {
+          waitUntil: "domcontentloaded",
+        });
         expect(page.url().endsWith("/view")).toBe(true);
       });
     });
