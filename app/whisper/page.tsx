@@ -25,8 +25,9 @@ export default function Page() {
     try {
       const newWhisper = await createWhisperServerAction(encryptedData, opts);
       router.push(`/whisper/${newWhisper.id}/created`);
-    } catch {
+    } catch (err) {
       setLoading(false);
+      throw err;
     }
   };
 

@@ -20,8 +20,9 @@ export const DeleteWhisperButton = (props: Props) => {
     try {
       await deleteWhisperServerAction(props.id);
       router.push(`/whisper/${props.id}/deleted`);
-    } catch {
+    } catch (err) {
       setLoading(false);
+      throw err;
     }
   };
 
@@ -32,7 +33,7 @@ export const DeleteWhisperButton = (props: Props) => {
       {
         loading: "Deleting...",
         success: "Whisper deleted!",
-        error: "Whisper has already been deleted",
+        error: "Failed to delete whisper",
       },
       { success: { icon: "🗑️" } }
     );
