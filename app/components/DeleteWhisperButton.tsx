@@ -17,17 +17,16 @@ export const DeleteWhisperButton = (props: Props) => {
   const router = useRouter();
 
   const deleteWhisper = async () => {
-    setLoading(true);
-    deleteWhisperServerAction(props.id)
-      .then(() => {
-        router.push(`/whisper/${props.id}/deleted`);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+    try {
+      await deleteWhisperServerAction(props.id);
+      router.push(`/whisper/${props.id}/deleted`);
+    } catch {
+      setLoading(false);
+    }
   };
 
   const onClickDelete = () => {
+    setLoading(true);
     toast.promise(
       deleteWhisper(),
       {

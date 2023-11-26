@@ -17,7 +17,7 @@ export default function Page({ params }: Props) {
   const router = useRouter();
   const origin = window.location.origin;
   const whisperPath = `/whisper/${params.id}`;
-  const whisperUrl = `${origin}${whisperPath}}`;
+  const whisperUrl = `${origin}${whisperPath}`;
   const deletePath = `/whisper/${params.id}/deleted`;
 
   useEffect(() => {

@@ -21,18 +21,17 @@ export default function Page() {
   const router = useRouter();
 
   const createWhisper = async () => {
-    setLoading(true);
     const encryptedData = encryptString(data);
-    createWhisperServerAction(encryptedData, opts)
-      .then((newWhisper) => {
-        router.push(`/whisper/${newWhisper.id}/created`);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
+    try {
+      const newWhisper = await createWhisperServerAction(encryptedData, opts);
+      router.push(`/whisper/${newWhisper.id}/created`);
+    } catch {
+      setLoading(false);
+    }
   };
 
   const onClickCreate = async () => {
+    setLoading(true);
     toast.promise(createWhisper(), {
       loading: "Creating...",
       success: "Whisper created!",

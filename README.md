@@ -2,6 +2,8 @@
 
 A self hosted e2e encrypted temporary note sharing application used for sending sensitive information.
 
+A demo of this app can be found at <https://ephemeral-whisper.vercel.app>
+
 ## Getting Started
 
 ### Quickstart
