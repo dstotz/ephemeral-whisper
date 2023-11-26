@@ -8,9 +8,8 @@ A demo of this app can be found at <https://ephemeral-whisper.vercel.app>
 
 ### Quickstart
 
-1. `yarn install`
-2. `bin/generate_env`
-3. `yarn dev`
+1. `bin/generate_env`
+2. `docker compose up`
 
 ### Configuration
 
@@ -54,7 +53,19 @@ Calling this endpoint will automatically purge any whispers that have expired as
 
 ### Local Dev
 
-Run the development server with `yarn dev`
+#### Docker
+
+You can run the entire app locally using `docker compose up`
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the app.
+
+Optionally you can run just the database with `docker compose up db` and then run the rest of the application locally
+
+#### Direct
+
+You can run the development server directly with `yarn dev`
+
+You must first make sure you have a Postgres database and add in the URLs to the `.env` file.
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the app.
 
@@ -62,9 +73,11 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 Tests are run using Playwright and have a GitHub action set up to automatically run on pushes to `main` or PR's.
 
+## Deploying
+
+This project is ready to deploy either as a Docker image, or directly to Vercel. You can also run `yarn build` and deploy to a source of your chosing.
+
 ### TODO
 
 - Add salting to the encryption
 - Component tests
-- Switch to Postgres
-- Dockerize local dev env

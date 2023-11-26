@@ -51,7 +51,9 @@ test.describe("View", () => {
           whisper = await updateWhisperRecord(whisper!.id, {
             showDeleteOnReadWarning: false,
           });
-          await page.goto(`/whisper/${whisper!.id}`);
+          await page.goto(`/whisper/${whisper!.id}`, {
+            waitUntil: "domcontentloaded",
+          });
           expect(page.url().endsWith("/view")).toBe(true);
         });
       });

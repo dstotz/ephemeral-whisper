@@ -1,6 +1,8 @@
 import { type NextRequest } from "next/server";
 import db from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 let locked = false;
 
 export async function GET(_request: NextRequest) {
