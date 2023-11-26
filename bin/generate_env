@@ -5,7 +5,7 @@
 #
 
 # Init dirs
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+SCRIPT_DIR="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 TEMP_DIR=$(mktemp -d)
 GENERATED_DIR="$ROOT_DIR/generated"
@@ -35,11 +35,11 @@ cat << EOF > $DOTENV_FILE
 DATABASE_URL="file:./dev.db"
 ENCRYPTION_PASSPHRASE="$ENCRYPTION_PASSPHRASE"
 SYMETRIC_KEY_BASE64="$SYMETRIC_KEY_BASE64"
-PRIVATE_KEY_BASE64="$(cat $PRIVATE_KEY | base64)"
-PUBLIC_KEY_BASE64="$(cat $PUBLIC_KEY | base64)"
+PRIVATE_KEY_BASE64="$(cat $PRIVATE_KEY | openssl base64 -A)"
+PUBLIC_KEY_BASE64="$(cat $PUBLIC_KEY | openssl base64 -A)"
 IV_BASE64="$IV_BASE64"
 # Client Env Vars
-NEXT_PUBLIC_CLIENT_PUBLIC_KEY_BASE64="$(cat $PUBLIC_KEY | base64)"
+NEXT_PUBLIC_CLIENT_PUBLIC_KEY_BASE64="$(cat $PUBLIC_KEY | openssl base64 -A)"
 NEXT_PUBLIC_IV_BASE64="$IV_BASE64"
 NEXT_PUBLIC_SYMETRIC_KEY_BASE64="$SYMETRIC_KEY_BASE64"
 EOF
