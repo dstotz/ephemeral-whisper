@@ -6,7 +6,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   workers: 1,
   retries: 0,
-  reporter: "html",
+  reporter: [["html", { open: "never" }]],
   use: {
     baseURL: "http://127.0.0.1:3000",
     trace: "on-first-retry",

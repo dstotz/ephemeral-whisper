@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { Page, expect } from "@playwright/test";
 import db from "@/lib/db";
 import { Prisma, Whisper } from "@prisma/client";
 import { encryptString } from "@/lib/encryption/client";
@@ -9,21 +9,19 @@ export const createWhisperAction = async (
 ): Promise<string | undefined> => {
   const whisperInput = page.getByTestId("whisper-input");
   await whisperInput.fill(content);
-
-  const createWhisperPromise = page.waitForResponse("/");
   await page.getByRole("button", { name: "Create Whisper" }).click();
-  await createWhisperPromise;
-
+  await page.getByRole("heading", { name: "Whisper link ready" }).isVisible();
   return await getWhisperIdFromUrl(page);
 };
 
 export const getWhisperIdFromUrl = async (
   page: Page
 ): Promise<string | undefined> => {
-  await page.url().includes("/whisper/");
-  const url = await page.url();
-  const whisperId = url.split("/").pop();
-  return whisperId;
+  if (page.url().includes("/whisper/")) {
+    const url = page.url();
+    const whisperId = url.split("/").pop();
+    return whisperId;
+  }
 };
 
 export const createWhisperRecord = async (data: Partial<Whisper>) => {

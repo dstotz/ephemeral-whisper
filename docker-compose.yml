@@ -1,0 +1,81 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: deps
+    command: yarn dev
+    ports:
+      - "3000:3000"
+    environment:
+      POSTGRES_PRISMA_URL: postgres://postgres:postgres@db:5432/postgres?pgbouncer=true&connect_timeout=15
+      POSTGRES_URL_NON_POOLING: postgres://postgres:postgres@db:5432/postgres
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      db:
+        condition: service_healthy
+      db-migrator:
+        condition: service_completed_successfully
+    profiles: [""]
+
+  db-migrator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: deps
+    command: yarn db:migrate
+    environment:
+      POSTGRES_PRISMA_URL: postgres://postgres:postgres@db:5432/postgres?pgbouncer=true&connect_timeout=15
+      POSTGRES_URL_NON_POOLING: postgres://postgres:postgres@db:5432/postgres
+    volumes:
+      - ./prisma:/app/prisma
+      - /app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["", "test"]
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles: ["", "test"]
+
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test-deps
+    command: yarn test
+    environment:
+      POSTGRES_PRISMA_URL: postgres://postgres:postgres@db:5432/postgres?pgbouncer=true&connect_timeout=15
+      POSTGRES_URL_NON_POOLING: postgres://postgres:postgres@db:5432/postgres
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      db:
+        condition: service_healthy
+      db-migrator:
+        condition: service_completed_successfully
+    profiles: ["test"]
+
+volumes:
+  postgres: {}

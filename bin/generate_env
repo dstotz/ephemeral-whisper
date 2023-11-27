@@ -4,6 +4,10 @@
 # Generate a .env file filled with random values suitable for local development
 #
 
+# Default to localhost DB using defualt creds
+DATABASE_URL="postgres://postgres:postgres@localhost:5432/postgres?pgbouncer=true&connect_timeout=15"
+DATABASE_URL_NON_POOLING="postgres://postgres:postgres@localhost:5432/postgres"
+
 # Init dirs
 SCRIPT_DIR="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
@@ -32,7 +36,8 @@ openssl rsa -in $PRIVATE_KEY -passin file:$PASSPHRASE_FILE -pubout -out $PUBLIC_
 # Output to new .env file
 cat << EOF > $DOTENV_FILE
 # Server Env Vars
-DATABASE_URL="file:./dev.db"
+POSTGRES_PRISMA_URL="$DATABASE_URL"
+POSTGRES_URL_NON_POOLING="$DATABASE_URL_NON_POOLING"
 ENCRYPTION_PASSPHRASE="$ENCRYPTION_PASSPHRASE"
 SYMETRIC_KEY_BASE64="$SYMETRIC_KEY_BASE64"
 PRIVATE_KEY_BASE64="$(cat $PRIVATE_KEY | openssl base64 -A)"
