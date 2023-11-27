@@ -24,33 +24,34 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
-# ENV POSTGRES_PRISMA_URL "postgres://fake:fake@fake/fake"
 RUN yarn prisma generate
-RUN yarn build
+# # Temporarily disabling build and run steps until
+# # client side encryption issue is solved
+# RUN yarn build
 
-# Production image, copy all the files and run next
-FROM base AS runner
-WORKDIR /app
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
+# # Production image, copy all the files and run next
+# FROM base AS runner
+# WORKDIR /app
+# ENV NODE_ENV production
+# ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# RUN addgroup --system --gid 1001 nodejs
+# RUN adduser --system --uid 1001 nextjs
 
-# Set the correct permission for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
+# # Set the correct permission for prerender cache
+# RUN mkdir .next
+# RUN chown nextjs:nodejs .next
 
-# Automatically leverage output traces to reduce image size
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# # Automatically leverage output traces to reduce image size
+# COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+# COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-USER nextjs
+# USER nextjs
 
-EXPOSE 3000
+# EXPOSE 3000
 
-ENV PORT 3000
-# set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
+# ENV PORT 3000
+# # set hostname to localhost
+# ENV HOSTNAME "0.0.0.0"
 
-CMD ["node", "server.js"]
+# CMD ["node", "server.js"]

@@ -73,11 +73,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 Tests are run using Playwright and have a GitHub action set up to automatically run on pushes to `main` or PR's.
 
-## Deploying
-
-This project is ready to deploy either as a Docker image, or directly to Vercel. You can also run `yarn build` and deploy to a source of your chosing.
-
 ### TODO
 
 - Add salting to the encryption
 - Component tests
+- Make it so the client encryption keys are not required at build time
